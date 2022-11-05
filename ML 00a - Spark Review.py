@@ -47,6 +47,11 @@ df = (spark.range(1, 1000000)
 
 # COMMAND ----------
 
+# 2022 10 24 MV: ADDED this cell to double-check dims (rows, columns) of this Spark dataframe df ... 
+print((df.count(), len(df.columns)))
+
+# COMMAND ----------
+
 # MAGIC %md <i18n value="a0c6912d-a8d6-449b-a3ab-5ca91c7f9805"/>
 # MAGIC 
 # MAGIC 

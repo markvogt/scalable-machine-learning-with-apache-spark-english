@@ -55,9 +55,25 @@
 
 # COMMAND ----------
 
+# 2022 10 29 MV: ADDED this cell...
+str_initial_content_dir = f"{DA.paths.datasets}/airbnb/sf-listings/sf-listings-2019-03-06-clean.parquet/"
+list_initial_content_dir = dbutils.fs.ls(str_initial_content_dir)
+for item in list_initial_content_dir: 
+    print(item.name)
+    print(item.path)
+    print(item.size)
+    print(item.modificationTime)
+    print("\r\n")
+
+# COMMAND ----------
+
+# 2022 10 22 MV: COMPOSE a FILEPATH to a SET of parquet files that contain data that will be used to create a Spark DataFrame...
 file_path = f"{DA.paths.datasets}/airbnb/sf-listings/sf-listings-2019-03-06-clean.parquet/"
+
+# 2022 10 22 MV: CREATE a SPARK DATAFRAME (that will live in the ATTACHED COMPUTE CLUSTER'S MEMORY) from the parquet files in the file_path; NOTE: this DOESN'T make a "Delta Table" - yet !!!
 airbnb_df = spark.read.format("parquet").load(file_path)
 
+# 2022 10 22 MV: EXECUTING the ADB "display()" command causes all the Spark commands PRECEDING it to FINALLY EXECUTE (note: this is "lazy execution") and create a DF in CLUSTER MEMORY... 
 display(airbnb_df)
 
 # COMMAND ----------
@@ -71,8 +87,25 @@ display(airbnb_df)
 # COMMAND ----------
 
 # Converting Spark DataFrame to Delta Table
+# 2022 10 22 MV: BETTER DESCRIPTION - PURGE any files that CURRENTLY reside in the working_dir...
 dbutils.fs.rm(DA.paths.working_dir, True)
+
+# 2022 10 22 MV: BETTER DESCRIPTION - WRITE the Spark Dataframe "airbnb_df" AS a "Delta Table" in the working_dir...
+#                IMPORTANT CONCEPT: it's the act of WRITING the dataframe to STORAGE (in the "Delta Table FORMAT") that makes the data PERSISTANT, which is part of the DEFINITION of "ACID" Transactions
+#                WITHOUT this writing-to-(CLUSTER)STORAGE the dataframe is just data-in-MEMORY, which ISN'T "PERSISTANT" therefore NOT "DURABLE", so a mere "dataframe" ISN'T a DELTA TABLE 
+#                BUT a "DELTA TABLE" (actually a SET of PARQUET FILES Written to the disk(s) in ADB (cluster?) storage) CAN be used to CREATE a (Spark) DataFrame :-) 
 airbnb_df.write.format("delta").mode("overwrite").save(DA.paths.working_dir)
+
+# COMMAND ----------
+
+# 2022 10 29 MV: ADDED this cell...
+list_working_dir = dbutils.fs.ls(DA.paths.working_dir)
+for item in list_working_dir: 
+    print(item.name)
+    print(item.path)
+    print(item.size)
+    print(item.modificationTime)
+    print("\r\n")
 
 # COMMAND ----------
 
@@ -84,10 +117,30 @@ airbnb_df.write.format("delta").mode("overwrite").save(DA.paths.working_dir)
 
 # COMMAND ----------
 
+# 2022 10 29 MV: ADDED this cell...
+DA.cleaned_username
+
+# COMMAND ----------
+
+# 2022 10 29 MV: EXECUTE Spark SQL cmd to CREATE-a-database-if-doesn't-already-exist named "mark_vogt"...
 spark.sql(f"CREATE DATABASE IF NOT EXISTS {DA.cleaned_username}")
+# 2022 10 29 MV: EXECUATE Spark SQL cmd to "USE" the stated database; this simply means the database name DOESN'T have to be explicitly stated in any other SQL cmds, so it's quicker :-) ...
 spark.sql(f"USE {DA.cleaned_username}")
 
+# 2022 10 29 MV: WRITE the contents of the SPARK DATAFRAM (remember it's STILL in MEMORY) AS ANOTHER set of (parquet?) files in ANOTHER (hidden?) directory AS a Spark SQL TABLE named "delta_review"...
 airbnb_df.write.format("delta").mode("overwrite").saveAsTable("delta_review")
+
+# COMMAND ----------
+
+# 2022 10 29 MV: ADDED this cell...
+strDefaultSparkSQLDir = "dbfs:/user/hive/warehouse/mark_vogt.db/delta_review"
+list_default_sparksql_dir = dbutils.fs.ls(strDefaultSparkSQLDir)
+for item in list_default_sparksql_dir: 
+    print(item.name)
+    print(item.path)
+    print(item.size)
+    print(item.modificationTime)
+    print("\r\n")
 
 # COMMAND ----------
 
@@ -128,6 +181,17 @@ display(dbutils.fs.ls(DA.paths.working_dir))
 
 # COMMAND ----------
 
+# 2022 10 29 MV: ADDED this cell...
+list_working_dir = dbutils.fs.ls(DA.paths.working_dir)
+for item in list_working_dir: 
+    print(item.name)
+    print(item.path)
+    print(item.size)
+    print(item.modificationTime)
+    print("\r\n")
+
+# COMMAND ----------
+
 display(dbutils.fs.ls(f"{DA.paths.working_dir}/_delta_log/"))
 
 # COMMAND ----------
@@ -144,6 +208,12 @@ display(dbutils.fs.ls(f"{DA.paths.working_dir}/_delta_log/"))
 # MAGIC - The commitInfo column has useful information about what the operation was (WRITE or READ) and who executed the operation.
 # MAGIC - The metaData column contains information about the column schema.
 # MAGIC - The protocol version contains information about the minimum Delta version necessary to either write or read to this Delta Table.
+
+# COMMAND ----------
+
+# 2022 10 29 MV: ADDED this cell...
+f = open('/dbfs/mnt/dbacademy-users/mark.vogt@avanade.com/scalable-machine-learning-with-apache-spark/_delta_log/00000000000000000000.json', "r")
+print(f.read())
 
 # COMMAND ----------
 

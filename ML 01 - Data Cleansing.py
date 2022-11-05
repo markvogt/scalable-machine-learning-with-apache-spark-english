@@ -45,13 +45,11 @@ display(raw_df)
 
 raw_df.columns
 
+
 # COMMAND ----------
 
-# MAGIC %md <i18n value="94856418-c319-4915-a73e-5728fcd44101"/>
-# MAGIC 
-# MAGIC 
-# MAGIC 
-# MAGIC For the sake of simplicity, only keep certain columns from this dataset. We will talk about feature selection later.
+# 2022 10 31 MV: ADDED this cell...
+len(raw_df.columns)
 
 # COMMAND ----------
 

@@ -31,6 +31,11 @@ airbnb_df = spark.read.format("delta").load(file_path)
 
 # COMMAND ----------
 
+# 2022 11 01 MV: ADDED this cell...
+display(airbnb_df)
+
+# COMMAND ----------
+
 # MAGIC %md <i18n value="f8b3c675-f8ce-4339-865e-9c64f05291a6"/>
 # MAGIC 
 # MAGIC 
@@ -74,6 +79,21 @@ ohe_encoder = OneHotEncoder(inputCols=index_output_cols, outputCols=ohe_output_c
 
 # COMMAND ----------
 
+# 2022 11 01 MV: ADDED this cell...
+categorical_cols
+
+# COMMAND ----------
+
+# 2022 11 01 MV: ADDED this cell...
+index_output_cols
+
+# COMMAND ----------
+
+# 2022 11 01 MV: ADDED this cell...
+ohe_output_cols
+
+# COMMAND ----------
+
 # MAGIC %md <i18n value="dedd7980-1c27-4f35-9d94-b0f1a1f92839"/>
 # MAGIC 
 # MAGIC 
@@ -89,6 +109,21 @@ from pyspark.ml.feature import VectorAssembler
 numeric_cols = [field for (field, dataType) in train_df.dtypes if ((dataType == "double") & (field != "price"))]
 assembler_inputs = ohe_output_cols + numeric_cols
 vec_assembler = VectorAssembler(inputCols=assembler_inputs, outputCol="features")
+
+# COMMAND ----------
+
+# 2022 11 01 MV: ADDED this cell...
+ohe_output_cols
+
+# COMMAND ----------
+
+# 2022 11 01 MV: ADDED this cell...
+numeric_cols
+
+# COMMAND ----------
+
+# 2022 11 01 MV: ADDED this cell...
+assembler_inputs
 
 # COMMAND ----------
 

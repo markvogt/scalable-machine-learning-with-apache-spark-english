@@ -104,7 +104,7 @@ from pyspark.ml.regression import LinearRegression
 lr = LinearRegression(featuresCol="bedrooms", labelCol="price")
 
 # Uncomment when running
-# lr_model = lr.fit(train_df)
+lr_model = lr.fit(train_df)
 
 # COMMAND ----------
 
@@ -163,6 +163,10 @@ vec_test_df = vec_assembler.transform(test_df)
 pred_df = lr_model.transform(vec_test_df)
 
 pred_df.select("bedrooms", "features", "price", "prediction").show()
+
+# COMMAND ----------
+
+display(pred_df)
 
 # COMMAND ----------
 
